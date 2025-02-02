@@ -70,3 +70,39 @@ fn test() {
     // - So, we can write as below:
     //   e_only_a(E::A(42)); // not allowed at this time.
 }
+
+
+//==================================================================================================
+// Specification-generic function example
+
+// Specification generic function
+fn e_generic<T: ESpec>(e: E<T>) -> E<T> {
+    match e {
+        E::A(data, hyp) => E::A(data + 1, hyp),
+        E::B(hyp) => E::B(hyp),
+    }
+}
+
+// Can generic functions return the different variant?
+// - Not possible? Then, this seems a severe limitation.
+// fn e_changing_variant<T: ESpec>(e: E<T>) -> E<T> {
+//     match e {
+//         E::A(_data, _hyp) => E::B(??),
+//         E::B(_hyp) => E::A(0, ??),
+//     }
+// }
+
+fn test_generic() {
+    let e_any: E<Any> = E::B(Default::default());
+    let _ : E<Any> = e_generic(e_any);
+    let e_a: E<OnlyA> = E::A(42, Default::default());
+    let _ : E<OnlyA> = e_generic(e_a);
+}
+
+// We also need to cast from one spec type to another.
+// - As long as one can prove the other is one's subtype.
+// - It's unclear how this could be done.
+fn test_cast() {
+    let _e_any: E<Any> = E::A(0, Default::default());
+    // let _ : E<OnlyA> = e_any as E<OnlyA>;
+}
